@@ -167,6 +167,66 @@
   }
 }
 
+.folder-tree-container {
+  max-height: 30vw;
+  overflow: auto;
+  padding-bottom: 0.5rem;
+  padding-top: 1rem;
+}
+
+.folder-tree {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+
+  &-item {
+    white-space: nowrap;
+  }
+
+  &-row {
+    align-items: center;
+    display: flex;
+  }
+
+  &-toggle {
+    border: none;
+    color: white;
+    padding: 0 0.5rem 0 0;
+    text-align: center;
+    width: 1.5rem;
+
+    &:disabled {
+      opacity: 0.4;
+    }
+  }
+
+  &-button {
+    border: none;
+    color: white;
+    font-weight: 400;
+    padding: 0;
+    text-align: left;
+    width: 100%;
+
+    &.is-selected {
+      font-weight: 600;
+    }
+  }
+
+  &-label::before {
+    content: "\1F4C1";
+    display: inline-block;
+    padding-right: 0.5rem;
+    transform: scale(1.1);
+  }
+
+  &-group {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+}
+
 .scrape-dialog {
   .column-label {
     color: $muted-gray;
