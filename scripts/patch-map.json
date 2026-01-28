@@ -1,0 +1,10 @@
+{
+  "comment": "Each entry describes a source file in this repo and where it should be copied inside the .stash folder.",
+  "entries": [
+    {
+      "source": "README.md",
+      "target": ".stash/README.md",
+      "comment": "Example: README.md will be copied into .stash/README.md so users can find it under the .stash folder."
+    }
+  ]
+}
