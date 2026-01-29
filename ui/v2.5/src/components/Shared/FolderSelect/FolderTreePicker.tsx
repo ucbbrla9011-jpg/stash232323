@@ -119,12 +119,12 @@ export const FolderTreePicker: React.FC<IFolderTreePickerProps> = ({
   );
 
   const rootDirectories = useMemo(() => {
-    if (defaultDirectories.length > 0) {
-      return defaultDirectories;
-    }
-
     if (currentDirectory) {
       return [currentDirectory];
+    }
+
+    if (defaultDirectories.length > 0) {
+      return defaultDirectories;
     }
 
     return baseDirectories ?? [];
@@ -267,6 +267,16 @@ export const FolderTreePicker: React.FC<IFolderTreePickerProps> = ({
     }
   };
 
+  const handleSelectParent = () => {
+    if (!parent) return;
+    if (defaultDirectories.includes(currentDirectory)) {
+      onSelectDirectory("");
+    } else {
+      onSelectDirectory(parent);
+    }
+    setFocusedPath(parent);
+  };
+
   return (
     <div
       className="folder-tree-container"
@@ -275,7 +285,7 @@ export const FolderTreePicker: React.FC<IFolderTreePickerProps> = ({
       onKeyDown={handleKeyDown}
     >
       <ul className="folder-tree">
-        {!defaultDirectories.length && parent && (
+        {currentDirectory && parent && (
           <li className="folder-tree-item folder-tree-parent" role="treeitem">
             <div className="folder-tree-row">
               <Button
@@ -287,10 +297,7 @@ export const FolderTreePicker: React.FC<IFolderTreePickerProps> = ({
                 data-path={parent}
                 data-has-children="false"
                 data-expanded="false"
-                onClick={() => {
-                  onSelectDirectory(parent);
-                  setFocusedPath(parent);
-                }}
+                onClick={handleSelectParent}
                 onFocus={() => setFocusedPath(parent)}
                 tabIndex={focusedPath === parent ? 0 : -1}
               >
@@ -306,6 +313,7 @@ export const FolderTreePicker: React.FC<IFolderTreePickerProps> = ({
             key={dir}
             path={dir}
             depth={0}
+            parentPath={currentDirectory === dir ? parent : undefined}
             expandedPaths={expandedPaths}
             focusedPath={focusedPath}
             hideError={hideError}
