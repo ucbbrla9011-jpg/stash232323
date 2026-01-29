@@ -1,10 +1,15 @@
 .library-layout {
   display: flex;
-  height: calc(100vh - 48.75px);
+  height: calc(100vh - #{$navbar-height});
   min-height: 600px;
   overflow: hidden;
   border: 1px solid $secondary;
   background-color: $body-bg;
+}
+
+.library-layout.is-dragging {
+  cursor: col-resize;
+  user-select: none;
 }
 
 .library-pane {

@@ -66,7 +66,10 @@ export const LibraryInspector: React.FC<LibraryInspectorProps> = ({
   if (error) {
     return (
       <ErrorMessage
-        message={intl.formatMessage({ id: "errors.loading_type" }, { type: "image" })}
+        message={intl.formatMessage(
+          { id: "errors.loading_type" },
+          { type: "image" }
+        )}
         error={error.message}
       />
     );

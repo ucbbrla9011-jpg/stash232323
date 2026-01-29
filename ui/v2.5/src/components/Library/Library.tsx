@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Mousetrap from "mousetrap";
+import { useIntl } from "react-intl";
 import * as GQL from "src/core/generated-graphql";
 import { useConfigurationContext } from "src/hooks/Config";
 import { ListFilterModel } from "src/models/list-filter/filter";
@@ -43,6 +44,7 @@ const arraysEqual = (a?: string[], b?: string[]) => {
 };
 
 const Library: React.FC = () => {
+  const intl = useIntl();
   const { configuration } = useConfigurationContext();
   const roots = useMemo(
     () => configuration?.general.stashes.map((stash) => stash.path) ?? [],
@@ -60,6 +62,7 @@ const Library: React.FC = () => {
   const [leftWidth, setLeftWidth] = useState(260);
   const [rightWidth, setRightWidth] = useState(360);
   const [dragState, setDragState] = useState<DragState | null>(null);
+  const isDragging = dragState !== null;
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -172,18 +175,13 @@ const Library: React.FC = () => {
     [selectedPath, visiblePaths]
   );
 
-  const handleSelectChange = useCallback(
-    (id: string, selected: boolean) => {
-      if (selected) {
-        setSelectedImageId(id);
-        setSelectedIds(new Set([id]));
-      } else {
-        setSelectedImageId(undefined);
-        setSelectedIds(new Set());
-      }
-    },
-    []
-  );
+  const handleSelectChange = useCallback((id: string, selected: boolean) => {
+    if (!selected) {
+      return;
+    }
+    setSelectedImageId(id);
+    setSelectedIds(new Set([id]));
+  }, []);
 
   const handlePreview = useCallback(
     (index: number) => {
@@ -304,7 +302,10 @@ const Library: React.FC = () => {
   ]);
 
   return (
-    <div className="library-layout" ref={containerRef}>
+    <div
+      className={`library-layout ${isDragging ? "is-dragging" : ""}`}
+      ref={containerRef}
+    >
       <div className="library-pane library-pane-left" style={{ width: leftWidth }}>
         <div className="library-pane-header">Library</div>
         <DirectoryTree
@@ -341,7 +342,10 @@ const Library: React.FC = () => {
           {loading && <LoadingIndicator />}
           {error && (
             <ErrorMessage
-              message="Failed to load images"
+              message={intl.formatMessage(
+                { id: "errors.loading_type" },
+                { type: intl.formatMessage({ id: "images" }) }
+              )}
               error={error.message}
             />
           )}
