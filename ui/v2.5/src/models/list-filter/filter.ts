@@ -151,7 +151,7 @@ export class ListFilterModel {
           : SortDirectionEnum.Asc;
     }
     if (params.disp !== undefined) {
-      this.displayMode = params.disp;
+      this.displayMode = this.normalizeDisplayMode(params.disp);
     }
     if (params.q !== undefined) {
       this.searchTerm = params.q;
@@ -305,7 +305,9 @@ export class ListFilterModel {
     this.sortDirection = findFilter?.direction ?? this.sortDirection;
     this.searchTerm = findFilter?.q ?? this.searchTerm;
 
-    this.displayMode = uiOptions?.display_mode ?? this.displayMode;
+    this.displayMode = this.normalizeDisplayMode(
+      uiOptions?.display_mode ?? this.displayMode
+    );
     this.zoomIndex = uiOptions?.zoom_index ?? this.zoomIndex;
 
     this.currentPage = 1;
@@ -590,7 +592,14 @@ export class ListFilterModel {
 
   public setDisplayMode(displayMode: DisplayMode) {
     const ret = this.clone();
-    ret.displayMode = displayMode;
+    ret.displayMode = this.normalizeDisplayMode(displayMode);
     return ret;
+  }
+
+  private normalizeDisplayMode(displayMode: DisplayMode) {
+    if (this.options.displayModeOptions.includes(displayMode)) {
+      return displayMode;
+    }
+    return this.options.displayModeOptions[0];
   }
 }
