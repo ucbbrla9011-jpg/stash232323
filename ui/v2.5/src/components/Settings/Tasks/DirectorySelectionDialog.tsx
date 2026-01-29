@@ -4,11 +4,11 @@ import {
   faPlus,
 } from "@fortawesome/free-solid-svg-icons";
 import React, { useState } from "react";
-import { Button, Col, Form, Row } from "react-bootstrap";
+import { Button, Col, Form, InputGroup, Row } from "react-bootstrap";
 import { useIntl } from "react-intl";
 import { Icon } from "src/components/Shared/Icon";
 import { ModalComponent } from "src/components/Shared/Modal";
-import { FolderSelect } from "src/components/Shared/FolderSelect/FolderSelect";
+import { FolderTreePicker } from "src/components/Shared/FolderSelect/FolderTreePicker";
 import { useConfigurationContext } from "src/hooks/Config";
 
 interface IDirectorySelectionDialogProps {
@@ -78,19 +78,32 @@ export const DirectorySelectionDialog: React.FC<
           </Row>
         ))}
 
-        <FolderSelect
-          currentDirectory={currentDirectory}
-          onChangeDirectory={setCurrentDirectory}
-          defaultDirectories={libraryPaths}
-          appendButton={
+        <InputGroup>
+          <Form.Control
+            className="btn-secondary"
+            placeholder={intl.formatMessage({ id: "setup.folder.file_path" })}
+            onChange={(event) => {
+              setCurrentDirectory(event.currentTarget.value);
+            }}
+            value={currentDirectory}
+            spellCheck={false}
+          />
+          <InputGroup.Append>
             <Button
               variant="secondary"
               onClick={() => addPath(currentDirectory)}
             >
               <Icon icon={faPlus} />
             </Button>
-          }
-        />
+          </InputGroup.Append>
+        </InputGroup>
+        <div className="mt-3">
+          <FolderTreePicker
+            currentDirectory={currentDirectory}
+            onSelectDirectory={setCurrentDirectory}
+            defaultDirectories={libraryPaths}
+          />
+        </div>
       </div>
     </ModalComponent>
   );

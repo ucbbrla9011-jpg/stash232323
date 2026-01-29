@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
+import { useIntl } from "react-intl";
 import { Button, InputGroup, Form, Collapse } from "react-bootstrap";
 import { Icon } from "../Icon";
 import { LoadingIndicator } from "../LoadingIndicator";
@@ -8,6 +8,7 @@ import { useDebounce } from "src/hooks/debounce";
 import TextUtils from "src/utils/text";
 import { useDirectoryPaths } from "./useDirectoryPaths";
 import { PatchComponent } from "src/patch";
+import { FolderTreePicker } from "./FolderTreePicker";
 
 interface IProps {
   currentDirectory: string;
@@ -33,13 +34,7 @@ const _FolderSelect: React.FC<IProps> = ({
   const [path, setPath] = useState(currentDirectory);
 
   const normalizedPath = quotePath ? TextUtils.stripQuotes(path) : path;
-  const { directories, parent, error, loading } = useDirectoryPaths(
-    normalizedPath,
-    hideError
-  );
-
-  const selectableDirectories =
-    (currentDirectory ? directories : defaultDirectories) ?? defaultDirectories;
+  const { error, loading } = useDirectoryPaths(normalizedPath, hideError);
 
   const debouncedSetDirectory = useDebounce(setPath, 250);
 
@@ -54,24 +49,6 @@ const _FolderSelect: React.FC<IProps> = ({
     onChangeDirectory(value);
     debouncedSetDirectory(value);
   }
-
-  function goUp() {
-    if (defaultDirectories?.includes(currentDirectory)) {
-      setInstant("");
-    } else if (parent) {
-      setInstant(parent);
-    }
-  }
-
-  const topDirectory = currentDirectory && parent && (
-    <li className="folder-list-parent folder-list-item">
-      <Button variant="link" onClick={() => goUp()} disabled={loading}>
-        <span>
-          <FormattedMessage id="setup.folder.up_dir" />
-        </span>
-      </Button>
-    </li>
-  );
 
   return (
     <>
@@ -115,20 +92,12 @@ const _FolderSelect: React.FC<IProps> = ({
       )}
 
       <Collapse in={!collapsible || showBrowser}>
-        <ul className="folder-list">
-          {topDirectory}
-          {selectableDirectories.map((dir) => (
-            <li key={dir} className="folder-list-item">
-              <Button
-                variant="link"
-                onClick={() => setInstant(dir)}
-                disabled={loading}
-              >
-                <span>{dir}</span>
-              </Button>
-            </li>
-          ))}
-        </ul>
+        <FolderTreePicker
+          currentDirectory={normalizedPath}
+          defaultDirectories={defaultDirectories}
+          hideError={hideError}
+          onSelectDirectory={(value) => setInstant(value)}
+        />
       </Collapse>
     </>
   );
