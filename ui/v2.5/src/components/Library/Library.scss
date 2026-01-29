@@ -1,0 +1,149 @@
+.library-layout {
+  display: flex;
+  height: calc(100vh - 48.75px);
+  min-height: 600px;
+  overflow: hidden;
+  border: 1px solid $secondary;
+  background-color: $body-bg;
+}
+
+.library-pane {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.library-pane-left,
+.library-pane-right {
+  flex: 0 0 auto;
+  background-color: $secondary;
+}
+
+.library-pane-center {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.library-pane-header {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid $border-color;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: $secondary;
+}
+
+.library-pane-body {
+  flex: 1 1 auto;
+  overflow: auto;
+  padding: 1rem;
+}
+
+.library-splitter {
+  width: 6px;
+  cursor: col-resize;
+  background-color: $border-color;
+}
+
+.library-tree {
+  padding: 0.5rem 0;
+  overflow: auto;
+}
+
+.library-tree-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.library-tree-item.is-selected {
+  background-color: $primary;
+  color: $white;
+}
+
+.library-tree-toggle {
+  border: none;
+  background: transparent;
+  padding: 0;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+}
+
+.library-tree-toggle:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.library-tree-folder {
+  opacity: 0.8;
+}
+
+.library-tree-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.library-tree-loading {
+  padding: 0.25rem 0.75rem;
+}
+
+.library-breadcrumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.library-breadcrumb {
+  border: none;
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  font-weight: 500;
+}
+
+.library-breadcrumb:hover {
+  text-decoration: underline;
+}
+
+.library-breadcrumb-separator {
+  opacity: 0.6;
+}
+
+.library-inspector {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.library-inspector-title {
+  font-size: 1.1rem;
+  margin: 0;
+  word-break: break-word;
+}
+
+.library-inspector-tabs {
+  .nav-link {
+    font-weight: 600;
+  }
+}
+
+.library-inspector-section {
+  padding-top: 1rem;
+}
+
+.library-empty {
+  text-align: center;
+  opacity: 0.7;
+  padding: 2rem 1rem;
+}
