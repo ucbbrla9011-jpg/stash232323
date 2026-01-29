@@ -225,15 +225,17 @@ export const TagList: React.FC<ITagList> = PatchComponent(
       function renderTags() {
         if (!result.data?.findTags) return;
 
+        const renderGrid = () => (
+          <TagCardGrid
+            tags={result.data.findTags.tags}
+            zoomIndex={filter.zoomIndex}
+            selectedIds={selectedIds}
+            onSelectChange={onSelectChange}
+          />
+        );
+
         if (filter.displayMode === DisplayMode.Grid) {
-          return (
-            <TagCardGrid
-              tags={result.data.findTags.tags}
-              zoomIndex={filter.zoomIndex}
-              selectedIds={selectedIds}
-              onSelectChange={onSelectChange}
-            />
-          );
+          return renderGrid();
         }
         if (filter.displayMode === DisplayMode.List) {
           const deleteAlert = (
@@ -353,7 +355,7 @@ export const TagList: React.FC<ITagList> = PatchComponent(
           );
         }
         if (filter.displayMode === DisplayMode.Wall) {
-          return <h1>TODO</h1>;
+          return renderGrid();
         }
       }
       return (

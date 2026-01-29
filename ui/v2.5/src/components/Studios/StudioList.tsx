@@ -133,22 +133,24 @@ export const StudioList: React.FC<IStudioList> = PatchComponent(
       function renderStudios() {
         if (!result.data?.findStudios) return;
 
+        const renderGrid = () => (
+          <StudioCardGrid
+            studios={result.data.findStudios.studios}
+            zoomIndex={filter.zoomIndex}
+            fromParent={fromParent}
+            selectedIds={selectedIds}
+            onSelectChange={onSelectChange}
+          />
+        );
+
         if (filter.displayMode === DisplayMode.Grid) {
-          return (
-            <StudioCardGrid
-              studios={result.data.findStudios.studios}
-              zoomIndex={filter.zoomIndex}
-              fromParent={fromParent}
-              selectedIds={selectedIds}
-              onSelectChange={onSelectChange}
-            />
-          );
+          return renderGrid();
         }
         if (filter.displayMode === DisplayMode.List) {
-          return <h1>TODO</h1>;
+          return renderGrid();
         }
         if (filter.displayMode === DisplayMode.Wall) {
-          return <h1>TODO</h1>;
+          return renderGrid();
         }
         if (filter.displayMode === DisplayMode.Tagger) {
           return <StudioTagger studios={result.data.findStudios.studios} />;
