@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "react-bootstrap";
 import { LoadingIndicator } from "src/components/Shared/LoadingIndicator";
+import TextUtils from "src/utils/text";
+import { FormattedMessage } from "react-intl";
 import { useDirectoryPaths } from "./useDirectoryPaths";
 
 interface IFolderTreePickerProps {
@@ -39,6 +41,9 @@ const TreeNode: React.FC<ITreeNodeProps> = ({
   const isExpanded = expandedPaths.has(path);
   const isSelected = focusedPath === path;
 
+  const label = TextUtils.fileNameFromPath(path);
+  const displayLabel = label.length > 0 ? label : path;
+
   return (
     <li
       className="folder-tree-item"
@@ -71,8 +76,9 @@ const TreeNode: React.FC<ITreeNodeProps> = ({
           }}
           onFocus={() => onFocusPath(path)}
           tabIndex={isSelected ? 0 : -1}
+          title={path}
         >
-          <span className="folder-tree-label">{path}</span>
+          <span className="folder-tree-label">{displayLabel}</span>
           {loading && <LoadingIndicator inline small message="" />}
         </Button>
       </div>
@@ -107,25 +113,32 @@ export const FolderTreePicker: React.FC<IFolderTreePickerProps> = ({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set());
   const [focusedPath, setFocusedPath] = useState<string | null>(null);
+  const { directories: baseDirectories, parent } = useDirectoryPaths(
+    currentDirectory,
+    hideError
+  );
 
   const rootDirectories = useMemo(() => {
     if (defaultDirectories.length > 0) {
       return defaultDirectories;
     }
 
-    return currentDirectory ? [currentDirectory] : [];
-  }, [currentDirectory, defaultDirectories]);
+    if (currentDirectory) {
+      return [currentDirectory];
+    }
+
+    return baseDirectories ?? [];
+  }, [baseDirectories, currentDirectory, defaultDirectories]);
 
   useEffect(() => {
-    if (currentDirectory) {
-      setFocusedPath(currentDirectory);
-      return;
-    }
-
-    if (!focusedPath && rootDirectories.length > 0) {
-      setFocusedPath(rootDirectories[0]);
-    }
-  }, [currentDirectory, focusedPath, rootDirectories]);
+    if (!currentDirectory) return;
+    setExpandedPaths((prev) => {
+      if (prev.has(currentDirectory)) return prev;
+      const next = new Set(prev);
+      next.add(currentDirectory);
+      return next;
+    });
+  }, [currentDirectory]);
 
   const updateExpandedPaths = (path: string, expand?: boolean) => {
     setExpandedPaths((prev) => {
@@ -142,7 +155,7 @@ export const FolderTreePicker: React.FC<IFolderTreePickerProps> = ({
 
   const focusPath = (path: string) => {
     const container = containerRef.current;
-    if (!container) return;
+    if (!container) return false;
     const items = Array.from(
       container.querySelectorAll<HTMLButtonElement>(
         "[data-tree-item='true']"
@@ -152,7 +165,9 @@ export const FolderTreePicker: React.FC<IFolderTreePickerProps> = ({
     if (target) {
       target.focus();
       setFocusedPath(path);
+      return true;
     }
+    return false;
   };
 
   const focusIndex = (index: number) => {
@@ -167,6 +182,16 @@ export const FolderTreePicker: React.FC<IFolderTreePickerProps> = ({
     items[index].focus();
     setFocusedPath(items[index].dataset.path ?? null);
   };
+
+  useEffect(() => {
+    if (currentDirectory && focusPath(currentDirectory)) {
+      return;
+    }
+
+    if (rootDirectories.length > 0) {
+      focusPath(rootDirectories[0]);
+    }
+  }, [currentDirectory, rootDirectories]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (
@@ -250,6 +275,32 @@ export const FolderTreePicker: React.FC<IFolderTreePickerProps> = ({
       onKeyDown={handleKeyDown}
     >
       <ul className="folder-tree">
+        {!defaultDirectories.length && parent && (
+          <li className="folder-tree-item folder-tree-parent" role="treeitem">
+            <div className="folder-tree-row">
+              <Button
+                variant="link"
+                className={`folder-tree-button${
+                  focusedPath === parent ? " is-selected" : ""
+                }`}
+                data-tree-item="true"
+                data-path={parent}
+                data-has-children="false"
+                data-expanded="false"
+                onClick={() => {
+                  onSelectDirectory(parent);
+                  setFocusedPath(parent);
+                }}
+                onFocus={() => setFocusedPath(parent)}
+                tabIndex={focusedPath === parent ? 0 : -1}
+              >
+                <span className="folder-tree-parent-label">
+                  <FormattedMessage id="setup.folder.up_dir" />
+                </span>
+              </Button>
+            </div>
+          </li>
+        )}
         {rootDirectories.map((dir) => (
           <TreeNode
             key={dir}

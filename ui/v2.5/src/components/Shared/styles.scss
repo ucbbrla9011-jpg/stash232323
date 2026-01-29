@@ -213,6 +213,10 @@
     }
   }
 
+  &-parent-label {
+    font-weight: 500;
+  }
+
   &-label::before {
     content: "\1F4C1";
     display: inline-block;
