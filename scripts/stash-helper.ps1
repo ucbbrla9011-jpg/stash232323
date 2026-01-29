@@ -13,7 +13,7 @@ function Invoke-StashGraphQL {
     } | ConvertTo-Json
 
     try {
-        $response = Invoke-RestMethod -Method Post -Uri $Uri -Body $query -ContentType "application/json" -TimeoutSec 2
+        $response = Invoke-RestMethod -Method Post -Uri $Uri -Body $query -ContentType "application/json" -TimeoutSec 2 -ErrorAction Stop
     } catch {
         return $null
     }
@@ -23,18 +23,22 @@ function Invoke-StashGraphQL {
         return $null
     }
 
+    if (-not (Test-Path -Path $configPath)) {
+        return $null
+    }
+
     return $configPath
 }
 
 function Get-StashConfigPathFromRunningProcess {
-    $process = $null
+    $processes = $null
     try {
-        $process = Get-Process -Name "stash" -ErrorAction Stop | Select-Object -First 1
+        $processes = Get-Process -Name "stash" -ErrorAction Stop
     } catch {
         return $null
     }
 
-    if ($null -eq $process) {
+    if ($null -eq $processes) {
         return $null
     }
 
@@ -44,9 +48,15 @@ function Get-StashConfigPathFromRunningProcess {
         return $configPath
     }
 
+    if (-not (Get-Command Get-NetTCPConnection -ErrorAction SilentlyContinue)) {
+        return $null
+    }
+
     $ports = @()
     try {
-        $connections = Get-NetTCPConnection -OwningProcess $process.Id -State Listen -ErrorAction Stop
+        $connections = $processes | ForEach-Object {
+            Get-NetTCPConnection -OwningProcess $_.Id -State Listen -ErrorAction Stop
+        }
         $ports = $connections | Select-Object -ExpandProperty LocalPort -Unique
     } catch {
         return $null
